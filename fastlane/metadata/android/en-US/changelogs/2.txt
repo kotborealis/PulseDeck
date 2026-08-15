@@ -1,0 +1,1 @@
+Improved empty-player state, added a direct button to notification access settings, and refreshes the active player immediately after returning from Android settings.

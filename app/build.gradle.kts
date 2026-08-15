@@ -5,7 +5,7 @@ plugins {
 }
 
 android { namespace = "io.github.kotborealis.pulsedeck"; compileSdk = 35
-    defaultConfig { applicationId = "io.github.kotborealis.pulsedeck"; minSdk = 26; targetSdk = 35; versionCode = 1; versionName = "0.1.0" }
+    defaultConfig { applicationId = "io.github.kotborealis.pulsedeck"; minSdk = 26; targetSdk = 35; versionCode = 2; versionName = "0.1.1" }
     signingConfigs {
         create("release") {
             val keystorePath = System.getenv("ANDROID_KEYSTORE_FILE")
