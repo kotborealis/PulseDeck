@@ -4,8 +4,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-android { namespace = "ru.hermes.mediacontroller"; compileSdk = 35
-    defaultConfig { applicationId = "ru.hermes.mediacontroller"; minSdk = 26; targetSdk = 35; versionCode = 1; versionName = "0.1.0" }
+android { namespace = "io.github.kotborealis.pulsedeck"; compileSdk = 35
+    defaultConfig { applicationId = "io.github.kotborealis.pulsedeck"; minSdk = 26; targetSdk = 35; versionCode = 1; versionName = "0.1.0" }
     signingConfigs {
         create("release") {
             val keystorePath = System.getenv("ANDROID_KEYSTORE_FILE")

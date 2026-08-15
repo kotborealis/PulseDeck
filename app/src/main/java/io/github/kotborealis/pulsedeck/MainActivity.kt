@@ -1,4 +1,4 @@
-package ru.hermes.mediacontroller
+package io.github.kotborealis.pulsedeck
 
 import android.content.ComponentName
 import android.content.Intent
