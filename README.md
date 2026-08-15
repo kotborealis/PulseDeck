@@ -4,6 +4,8 @@ Compact Android media controller for split-screen use with maps.
 
 PulseDeck is designed for a phone layout where a navigation app occupies most of the screen and PulseDeck runs in the other split-screen pane. It controls the currently active Android media session without drawing overlays over other apps.
 
+![PulseDeck split-screen controller](docs/screenshot.jpg)
+
 ## Features
 
 - Previous / play-pause / next controls.
