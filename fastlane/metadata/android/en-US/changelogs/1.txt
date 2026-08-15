@@ -1,0 +1,1 @@
+Initial F-Droid-ready release: split-screen media controls, album-art background, real playback progress, and automatic active-player switching.

@@ -49,6 +49,12 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 Then open PulseDeck, enable its notification access in Android Settings, start a supported music app, and put PulseDeck in split screen with your navigation app.
 
+## F-Droid
+
+PulseDeck is prepared for submission to the official F-Droid repository. The project includes the MIT license, Gradle Wrapper, tagged release, and Fastlane-compatible descriptions, icon, changelog, and screenshot under `fastlane/metadata/android/en-US/`.
+
+F-Droid builds and signs the APK independently, so no private Android signing key is stored in this repository. See [the F-Droid preparation notes](docs/f-droid.md).
+
 ## GitHub Actions
 
 The `android-ci.yml` workflow runs on pushes and pull requests. It checks the project and publishes a debug APK as a workflow artifact.
