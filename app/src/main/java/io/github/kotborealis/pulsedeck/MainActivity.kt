@@ -45,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.media.session.MediaButtonReceiver
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
@@ -81,6 +82,15 @@ class MainActivity : ComponentActivity() {
         var position by remember { mutableLongStateOf(0L) }
         var duration by remember { mutableLongStateOf(0L) }
         var accessGranted by remember { mutableStateOf(hasNotificationAccess()) }
+        var refreshToken by remember { mutableIntStateOf(0) }
+
+        DisposableEffect(Unit) {
+            val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) refreshToken++
+            }
+            lifecycle.addObserver(observer)
+            onDispose { lifecycle.removeObserver(observer) }
+        }
 
 
         fun sync() {
@@ -94,9 +104,16 @@ class MainActivity : ComponentActivity() {
                 playing = c.playbackState?.state == PlaybackStateCompat.STATE_PLAYING
                 position = c.playbackState?.position?.coerceAtLeast(0L) ?: 0L
                 duration = c.metadata?.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)?.coerceAtLeast(0L) ?: 0L
+            } ?: run {
+                title = "Музыка не запущена"
+                artist = "Запусти любой медиаплеер — PulseDeck подключится автоматически"
+                cover = null
+                playing = false
+                position = 0L
+                duration = 0L
             }
         }
-        LaunchedEffect(Unit) { sync() }
+        LaunchedEffect(refreshToken) { sync() }
         LaunchedEffect(current) {
             while (true) {
                 val discovered = activeController()
@@ -134,23 +151,27 @@ class MainActivity : ComponentActivity() {
                         Box(Modifier.clip(RoundedCornerShape(18.dp)).background(Color.White).clickable { safely { startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) } }.padding(horizontal = 18.dp, vertical = 11.dp)) {
                             Text("Открыть настройки доступа", color = Color(0xFF151619), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                         }
-                        Spacer(Modifier.height(22.dp))
-                    }
-                    Text(title, color = Color.White, fontSize = 23.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false, overflow = TextOverflow.Clip, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth().basicMarquee(iterations = Int.MAX_VALUE, initialDelayMillis = 1200, repeatDelayMillis = 1400))
-                    Spacer(Modifier.height(4.dp))
-                    Text(artist, color = Color.White.copy(.66f), fontSize = 15.sp, maxLines = 1, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                    Spacer(Modifier.height(16.dp))
-                    Box(Modifier.fillMaxWidth().height(5.dp).clip(RoundedCornerShape(5.dp)).background(Color.White.copy(.24f))) {
-                        val progress = if (duration > 0) (position.toFloat() / duration.toFloat()).coerceIn(0f, 1f) else 0f
-                        Box(Modifier.fillMaxWidth(progress).height(5.dp).clip(RoundedCornerShape(5.dp)).background(Color.White))
-                    }
-                    Spacer(Modifier.height(18.dp))
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-                        LargeButton(Icons.Default.SkipPrevious) { safely { current?.transportControls?.skipToPrevious() } }
-                        Box(Modifier.size(76.dp).clip(CircleShape).background(Color.White).clickable { safely { if (playing) current?.transportControls?.pause() else current?.transportControls?.play() } }, contentAlignment = Alignment.Center) {
-                            Icon(if (playing) Icons.Default.Pause else Icons.Default.PlayArrow, null, tint = Color(0xFF151619), modifier = Modifier.size(42.dp))
+                    } else if (current == null) {
+                        Text("Музыка не запущена", color = Color.White, fontSize = 23.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                        Spacer(Modifier.height(8.dp))
+                        Text("Запусти любой медиаплеер — PulseDeck подключится автоматически", color = Color.White.copy(.66f), fontSize = 15.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    } else {
+                        Text(title, color = Color.White, fontSize = 23.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false, overflow = TextOverflow.Clip, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth().basicMarquee(iterations = Int.MAX_VALUE, initialDelayMillis = 1200, repeatDelayMillis = 1400))
+                        Spacer(Modifier.height(4.dp))
+                        Text(artist, color = Color.White.copy(.66f), fontSize = 15.sp, maxLines = 1, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                        Spacer(Modifier.height(16.dp))
+                        Box(Modifier.fillMaxWidth().height(5.dp).clip(RoundedCornerShape(5.dp)).background(Color.White.copy(.24f))) {
+                            val progress = if (duration > 0) (position.toFloat() / duration.toFloat()).coerceIn(0f, 1f) else 0f
+                            Box(Modifier.fillMaxWidth(progress).height(5.dp).clip(RoundedCornerShape(5.dp)).background(Color.White))
                         }
-                        LargeButton(Icons.Default.SkipNext) { safely { current?.transportControls?.skipToNext() } }
+                        Spacer(Modifier.height(18.dp))
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+                            LargeButton(Icons.Default.SkipPrevious) { safely { current?.transportControls?.skipToPrevious() } }
+                            Box(Modifier.size(76.dp).clip(CircleShape).background(Color.White).clickable { safely { if (playing) current?.transportControls?.pause() else current?.transportControls?.play() } }, contentAlignment = Alignment.Center) {
+                                Icon(if (playing) Icons.Default.Pause else Icons.Default.PlayArrow, null, tint = Color(0xFF151619), modifier = Modifier.size(42.dp))
+                            }
+                            LargeButton(Icons.Default.SkipNext) { safely { current?.transportControls?.skipToNext() } }
+                        }
                     }
                 }
             }
