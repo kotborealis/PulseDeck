@@ -65,6 +65,12 @@ class MainActivity : ComponentActivity() {
         sessions.firstOrNull()?.let { MediaControllerCompat(this, android.support.v4.media.session.MediaSessionCompat.Token.fromToken(it.sessionToken)) }
     } catch (_: Throwable) { null }
 
+    private fun hasNotificationAccess(): Boolean {
+        val enabled = Settings.Secure.getString(contentResolver, "enabled_notification_listeners") ?: return false
+        val component = ComponentName(this, MediaNotificationListener::class.java).flattenToString()
+        return enabled.split(":").any { it.equals(component, ignoreCase = true) }
+    }
+
     @Composable
     private fun ControllerScreen() {
         var current by remember { mutableStateOf<MediaControllerCompat?>(null) }
@@ -74,9 +80,11 @@ class MainActivity : ComponentActivity() {
         var playing by remember { mutableStateOf(false) }
         var position by remember { mutableLongStateOf(0L) }
         var duration by remember { mutableLongStateOf(0L) }
+        var accessGranted by remember { mutableStateOf(hasNotificationAccess()) }
 
 
         fun sync() {
+            accessGranted = hasNotificationAccess()
             current = activeController(); controller = current
             current?.let { c ->
                 title = c.metadata?.getString(MediaMetadataCompat.METADATA_KEY_TITLE) ?: "Без названия"
@@ -96,6 +104,7 @@ class MainActivity : ComponentActivity() {
                     current = discovered
                     controller = discovered
                 }
+                accessGranted = hasNotificationAccess()
                 current?.let { c ->
                     try {
                         title = c.metadata?.getString(MediaMetadataCompat.METADATA_KEY_TITLE) ?: title
@@ -118,8 +127,16 @@ class MainActivity : ComponentActivity() {
             }
             Column(Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 18.dp), verticalArrangement = Arrangement.SpaceBetween) {
                 Spacer(Modifier.height(24.dp))
-                Column(Modifier.fillMaxWidth()) {
-                    Text(title, color = Color.White, fontSize = 23.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().basicMarquee(iterations = Int.MAX_VALUE, initialDelayMillis = 1200, repeatDelayMillis = 1400))
+                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    if (!accessGranted) {
+                        Text("Чтобы увидеть трек и управлять музыкой, включи доступ к медиасессиям", color = Color.White.copy(.72f), fontSize = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                        Spacer(Modifier.height(10.dp))
+                        Box(Modifier.clip(RoundedCornerShape(18.dp)).background(Color.White).clickable { safely { startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) } }.padding(horizontal = 18.dp, vertical = 11.dp)) {
+                            Text("Открыть настройки доступа", color = Color(0xFF151619), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        }
+                        Spacer(Modifier.height(22.dp))
+                    }
+                    Text(title, color = Color.White, fontSize = 23.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false, overflow = TextOverflow.Clip, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth().basicMarquee(iterations = Int.MAX_VALUE, initialDelayMillis = 1200, repeatDelayMillis = 1400))
                     Spacer(Modifier.height(4.dp))
                     Text(artist, color = Color.White.copy(.66f), fontSize = 15.sp, maxLines = 1, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                     Spacer(Modifier.height(16.dp))
