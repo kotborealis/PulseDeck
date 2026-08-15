@@ -59,7 +59,7 @@ F-Droid builds and signs the APK independently, so no private Android signing ke
 
 The `android-ci.yml` workflow runs on pushes and pull requests. It checks the project and publishes a debug APK as a workflow artifact.
 
-The `release.yml` workflow builds a signed Android App Bundle when a `v*` tag is pushed. Configure these repository secrets before creating a release:
+The optional `release.yml` workflow can be run manually when a signed Google Play App Bundle is needed. Configure these repository secrets before running it:
 
 - `ANDROID_KEYSTORE_BASE64`
 - `ANDROID_KEYSTORE_PASSWORD`
