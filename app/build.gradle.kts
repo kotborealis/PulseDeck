@@ -5,7 +5,7 @@ plugins {
 }
 
 android { namespace = "io.github.kotborealis.pulsedeck"; compileSdk = 35
-    defaultConfig { applicationId = "io.github.kotborealis.pulsedeck"; minSdk = 26; targetSdk = 35; versionCode = 2; versionName = "0.1.1" }
+    defaultConfig { applicationId = "io.github.kotborealis.pulsedeck"; minSdk = 26; targetSdk = 35; versionCode = 3; versionName = "0.1.2" }
     signingConfigs {
         create("release") {
             val keystorePath = System.getenv("ANDROID_KEYSTORE_FILE")
@@ -27,8 +27,6 @@ android { namespace = "io.github.kotborealis.pulsedeck"; compileSdk = 35
     }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
 }
-
-kotlin { jvmToolchain(17) }
 
 dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2024.12.01")

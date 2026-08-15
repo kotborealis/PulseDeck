@@ -1,0 +1,1 @@
+Updated the build configuration for broader F-Droid build-server compatibility.
