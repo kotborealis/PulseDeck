@@ -1,0 +1,1 @@
+Fixed Kotlin and Java JVM target compatibility on F-Droid build servers.
