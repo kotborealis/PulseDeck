@@ -1,12 +1,13 @@
-PulseDeck provides large, high-contrast controls for the currently active Android media session while another app, such as a navigation app, is open beside it in split screen.
+<p>PulseDeck provides large, high-contrast controls for the currently active Android media session while another app, such as a navigation app, is open beside it in split screen.</p>
 
-Features:
+<p>Features:</p>
+<ul>
+  <li>Previous, play/pause, and next controls</li>
+  <li>Track title and artist</li>
+  <li>Album artwork as a blurred background</li>
+  <li>Real playback progress</li>
+  <li>Horizontal scrolling for long track titles</li>
+  <li>Automatic reconnection when the active music player changes</li>
+</ul>
 
-- Previous, play/pause, and next controls
-- Track title and artist
-- Album artwork as a blurred background
-- Real playback progress
-- Horizontal scrolling for long track titles
-- Automatic reconnection when the active music player changes
-
-PulseDeck does not play or stream music, does not show overlays, and does not send user data to a server. It uses Android Notification Access / media-session access only to discover and control the active player.
+<p>PulseDeck does not play or stream music, does not show overlays, and does not send user data to a server. It uses Android Notification Access / media-session access only to discover and control the active player.</p>
