@@ -26,6 +26,10 @@ android { namespace = "io.github.kotborealis.pulsedeck"; compileSdk = 35
         }
     }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
 }
 
 kotlin {

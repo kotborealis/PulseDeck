@@ -7,6 +7,10 @@ on:
         description: Release tag to publish
         required: true
         default: v0.1.3
+      source_ref:
+        description: Git ref containing the release source
+        required: true
+        default: main
 
 permissions:
   contents: write
@@ -19,7 +23,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.tag || github.ref }}
+          ref: ${{ inputs.source_ref || inputs.tag || github.ref }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -53,8 +57,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
         run: |
-          gh release create "$RELEASE_TAG" \
-            app/build/outputs/apk/release/app-release.apk \
-            --repo "$GITHUB_REPOSITORY" \
-            --title "PulseDeck $RELEASE_TAG" \
-            --generate-notes
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" \
+              app/build/outputs/apk/release/app-release.apk \
+              --repo "$GITHUB_REPOSITORY" \
+              --clobber
+          else
+            gh release create "$RELEASE_TAG" \
+              app/build/outputs/apk/release/app-release.apk \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "PulseDeck $RELEASE_TAG" \
+              --generate-notes
+          fi
